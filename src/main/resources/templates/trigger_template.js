@@ -5,7 +5,7 @@ const data = {
   MSISDN: 88005553535,
   event: "init",
 };
-const response = await fetch(localhost:8080/api/trigger, {
+const response = await fetch(192.168.1.105:8080/api/trigger, {
   method: "POST",
   mode: "cors",
   cache: "no-cache",
@@ -23,12 +23,12 @@ for (let i = 0; i < elements.length; i++) {
   const data = {
     unitId: $trigger.getUnitId(),
     containerId: $trigger.getContainerId(),
-    ASID: $trigger.getASID(),
+    ASID: window.localStorage.getItem("ASID"),
     triggerId: $trigger.getTriggerId(),
     event: $trigger.getEvent(),
   }
   elements[i].addEventListener($trigger.getEvent(), async () => {
-    const response = await fetch(localhost:8080/api/trigger, {
+    const response = await fetch(192.168.1.105:8080/api/trigger, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',

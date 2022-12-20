@@ -107,10 +107,13 @@ public class ContainerController {
         Container newContainer = new Container(requestBody.getUserId(), requestBody.getUnitId(), requestBody.getContainerName());
         newContainer = containerRepository.save(newContainer);
         List<TriggerTemplateDTO> triggers = new ArrayList<>();
+        List<TriggerDTO> resultTriggers = new ArrayList<>();
+
         for (TriggerDTO t : requestBody.getTriggers()){
             Trigger newTrigger = new Trigger(newContainer.getContainerId(), newContainer.getUnitId(), newContainer.getUserId(), t.getElement().getName(), t.getElement().getId(), t.getElement().getClassName(), t.getEvent());
             newTrigger = triggerRepository.save(newTrigger);
             triggers.add(new TriggerTemplateDTO(t, requestBody.getUnitId(), newContainer.getContainerId(), newTrigger.getTriggerId(), 0L));
+            resultTriggers.add(new TriggerDTO(newTrigger));
         }
 
         String filePath = "src/main/resources/static/trigger" + newContainer.getContainerId().toString() + ".js";
@@ -120,7 +123,7 @@ public class ContainerController {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
-        json = objectMapper.writeValueAsString(new ContainerDTO(newContainer, requestBody.getTriggers()));
+        json = objectMapper.writeValueAsString(new ContainerDTO(newContainer, resultTriggers));
         return json;
     }
 
