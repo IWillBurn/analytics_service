@@ -3,6 +3,9 @@ This is backend part of the analytics service.
 You can see the frontend part here: https://github.com/gmvrpw/analytic-ui  
 
 Всё писалось самостоятельно без использованния предложенного шаблона, поэтому чтобы совсем не заблудиться вот немного информации.  
+Работали:  
+&emsp;Боярников Евгений  
+&emsp;Боярников Александр
   
 Основные технологии:  
 &emsp;Spring - REST API  
