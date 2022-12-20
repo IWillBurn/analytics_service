@@ -87,9 +87,10 @@ public class UnitController {
             produces = "application/json"
     )
     public String addUnit(@RequestBody UnitPageDTO requestBody){
-        ObjectMapper objectMapper = new ObjectMapper();
         Unit newUnit = new Unit(requestBody.getUserId(), requestBody.getUnitName());
         unitRepository.save(newUnit);
+
+        ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
         try {
             json = objectMapper.writeValueAsString(new UnitDTO(newUnit));
@@ -109,8 +110,8 @@ public class UnitController {
         Unit result = searchResult.get();
         result.changeUnit(requestBody);
         unitRepository.save(result);
+
         ObjectMapper objectMapper = new ObjectMapper();
-        unitRepository.save(result);
         String json = "{}";
         try {
             json = objectMapper.writeValueAsString(new UnitDTO(result));

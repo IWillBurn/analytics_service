@@ -28,13 +28,13 @@ public class Unit {
     public Unit() {
     }
     public Unit(Long user, String name) {
-        this.userId = user;
-        this.unitName = name;
+        userId = user;
+        unitName = name;
     }
 
     public void changeUnit(UnitPageDTO dto){
         if (dto.getUnitName() != null){
-            this.setUnitName(dto.getUnitName());
+            setUnitName(dto.getUnitName());
         }
     }
 }

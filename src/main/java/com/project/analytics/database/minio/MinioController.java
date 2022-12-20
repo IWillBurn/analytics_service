@@ -25,7 +25,7 @@ public class MinioController {
         minioClient =
                 MinioClient.builder()
                         .endpoint("http://127.0.0.1:9000")
-                        .credentials("rRVJCrSLon7bZy0D", "MLxgW4BTv57yGdT1Ngy1FGo12o6Ax0Ch")
+                        .credentials("0T4djQNXJSgmwQIw", "yUPbWBqXSmPttDJBeds2E8t4S4KGOnKn")
                         .build();
     }
     public InputStream getObject(String bucket, String object) {

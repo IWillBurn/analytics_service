@@ -20,6 +20,6 @@ public class Owner {
     }
 
     public Owner(String name) {
-        this.userName = name;
+        userName = name;
     }
 }

@@ -8,16 +8,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class TriggerResultDTO {
-    private Long unitId;
-
-    private Long containerId;
-
-    private Long triggerId;
-
+public class ASIDDTO {
     private Long ASID;
-
-    private Long MSISDN;
-
-    private String event;
 }
