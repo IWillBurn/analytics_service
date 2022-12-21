@@ -1,4 +1,4 @@
-const data = {
+let data = {
   unitId: $unitId,
   containerId: $containerId,
   ASID: window.localStorage.getItem("ASID"),
@@ -17,10 +17,29 @@ const response = await fetch(192.168.1.105:8080/api/trigger, {
 const responceJson = await response.json();
 window.localStorage.setItem("ASID", responceJson.ASID);
 
+let data = {
+  unitId: $unitId,
+  containerId: $containerId,
+  ASID: window.localStorage.getItem("ASID"),
+  MSISDN: 88005553535,
+  event: "online",
+};
+setInterval(async () => {
+    await fetch(192.168.1.105:8080/api/trigger, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data }),
+    });
+}, 10000)
+
 #foreach($trigger in $triggers)
 let elements = querySelectorAll("$trigger.getQuerySelector()");
 for (let i = 0; i < elements.length; i++) {
-  const data = {
+  data = {
     unitId: $trigger.getUnitId(),
     containerId: $trigger.getContainerId(),
     ASID: window.localStorage.getItem("ASID"),

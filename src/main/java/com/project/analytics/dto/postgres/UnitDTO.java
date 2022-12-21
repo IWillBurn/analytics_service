@@ -9,9 +9,12 @@ import lombok.Data;
 @AllArgsConstructor
 public class UnitDTO {
     private String unitName;
+
+    private Long countOfContainers;
     private Long unitId;
-    public UnitDTO(Unit unit){
+    public UnitDTO(Unit unit, Long count){
         unitName = unit.getUnitName();
         unitId = unit.getUnitId();
+        countOfContainers = count;
     }
 }

@@ -49,7 +49,7 @@ public class UnitController {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
         try {
-            json = objectMapper.writeValueAsString(new UnitDTO(searchResult.get(0)));
+            json = objectMapper.writeValueAsString(new UnitDTO(searchResult.get(0), containerRepository.countByUnitId(unitId)));
         } catch (JsonProcessingException exception) {
             exception.printStackTrace();
         }
@@ -76,7 +76,7 @@ public class UnitController {
         }
         List<UnitDTO> outputs = new ArrayList<>();
         for (Unit u : searchResult){
-            outputs.add(new UnitDTO(u));
+            outputs.add(new UnitDTO(u, containerRepository.countByUnitId(u.getUnitId())));
         }
         try {
             json = objectMapper.writeValueAsString(outputs);
@@ -98,7 +98,7 @@ public class UnitController {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
         try {
-            json = objectMapper.writeValueAsString(new UnitDTO(newUnit));
+            json = objectMapper.writeValueAsString(new UnitDTO(newUnit, 0L));
         } catch (JsonProcessingException exception) {
             exception.printStackTrace();
         }
@@ -119,7 +119,7 @@ public class UnitController {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
         try {
-            json = objectMapper.writeValueAsString(new UnitDTO(result));
+            json = objectMapper.writeValueAsString(new UnitDTO(result, containerRepository.countByUnitId(unitId)));
         } catch (JsonProcessingException exception) {
             exception.printStackTrace();
         }

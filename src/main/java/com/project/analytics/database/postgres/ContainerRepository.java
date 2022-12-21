@@ -10,4 +10,6 @@ public interface ContainerRepository extends JpaRepository<Container, Long> {
     List<Container> deleteByUnitId(Long id);
     List<Container> findByUserId(Long userId);
     List<Container> findByUnitId(Long unitId);
+
+    Long countByUnitId(Long unitId);
 }

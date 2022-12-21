@@ -16,8 +16,6 @@ public class Visitor {
 
     @Column(name = "unit_id")
     private Long unitId;
-    @Column(name = "container_id")
-    private Long containerId;
 
     @Column(name = "msisdn")
     private Long MSISDN;
@@ -36,12 +34,10 @@ public class Visitor {
 
     public Visitor(Long unit_id, Long container_id, Long number) {
         unitId = unit_id;
-        containerId = container_id;
         MSISDN = number;
     }
 
     public Visitor(Long unit_id, Long container_id) {
         unitId = unit_id;
-        containerId = container_id;
     }
 }

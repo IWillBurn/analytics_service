@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,5 +62,42 @@ public class RequestController {
         resultASID = dataRepository.dataEventBAfterEventA(triggerIdA, triggerIdB, new Date(dateFrom), new Date(dateTo), deltaTimeMin*1000000, deltaTimeMax*1000000);
         System.out.println(resultASID);
         return "{ \"result\": " + resultASID.toString() + " }";
+    }
+    @GetMapping(
+            value = "/online",
+            produces = "application/json"
+    )
+    public String countOnline(@RequestParam(name = "triggerId") Long triggerId,
+                              @RequestParam(name = "date", required = false) Long date) {
+        if (date == null){ date = System.currentTimeMillis(); }
+        Long resultCounts = dataRepository.countOnline(triggerId, new Date(date));
+        return "{ \"result\": " + resultCounts.toString() + " }";
+    }
+
+    @GetMapping(
+            value = "/enriched",
+            produces = "application/json"
+    )
+    public String percentageOfEnriched(@RequestParam(name = "unitId") Long unitId,
+                                       @RequestParam(name = "containerId", required = false) Long containerId,
+                                       @RequestParam(name = "dateFrom", required = false) Long dateFrom,
+                                       @RequestParam(name = "dateTo", required = false) Long dateTo) {
+        double resultCountsEnriched = 0L;
+        double resultCountsAll = 0L;
+        if (dateFrom == null){ dateFrom = 0L; }
+        if (dateTo == null){ dateTo = 6311520000000L; }
+        if (containerId == null) {
+            resultCountsEnriched = dataRepository.countEnrichedInUnitData(unitId, new Date(dateFrom), new Date(dateTo)).doubleValue();
+            resultCountsAll = dataRepository.countAllInUnitData(unitId, new Date(dateFrom), new Date(dateTo)).doubleValue();
+        }
+        else{
+            resultCountsEnriched = dataRepository.countEnrichedInContainerData(unitId, new Date(dateFrom), new Date(dateTo));
+            resultCountsAll = dataRepository.countAllInContainerData(unitId, new Date(dateFrom), new Date(dateTo));
+        }
+        System.out.println(resultCountsEnriched);
+        System.out.println(resultCountsAll);
+        Long result = (long)(resultCountsEnriched/resultCountsAll * 100);
+
+        return "{ \"result\": " + result.toString() + " }";
     }
 }
