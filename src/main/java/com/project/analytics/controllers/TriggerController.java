@@ -8,11 +8,16 @@ import com.project.analytics.dto.postgres.UnitDTO;
 import com.project.analytics.dto.request.ASIDDTO;
 import com.project.analytics.dto.request.TriggerResultDTO;
 import com.project.analytics.dto.request.UnitPageDTO;
+import com.project.analytics.dto.request.UserDTO;
 import com.project.analytics.dto.templates.TriggerTemplateDTO;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.utils.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -20,6 +25,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/trigger")
 @RequiredArgsConstructor
@@ -32,8 +38,9 @@ public class TriggerController {
     private VisitorRepository visitorRepository;
 
     @PostMapping("")
-    public String getDataFromTrigger(@RequestBody TriggerResultDTO trigger) throws IOException {
+    public String getDataFromTrigger(@RequestBody TriggerResultDTO trigger) throws IOException, JSONException {
         Timestamp date = new Timestamp(System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis());
         Data data;
         ASIDDTO asiddto = new ASIDDTO(0L);
         if (trigger.getMSISDN() == null){
@@ -58,8 +65,8 @@ public class TriggerController {
             }
         }
         else{
+            List<Visitor> visitors = visitorRepository.findByMSISDN(trigger.getMSISDN());
             if (trigger.getASID() == null){
-                List<Visitor> visitors = visitorRepository.findByMSISDN(trigger.getMSISDN());
                 Visitor visitor;
                 if (visitors.isEmpty()){
                     visitor = new Visitor(trigger.getUnitId(), trigger.getContainerId(), trigger.getMSISDN());
@@ -70,36 +77,42 @@ public class TriggerController {
                 asiddto.setASID(visitor.getASID());
             }
             else{
-                List<Visitor> visitorsWithThisMSISDN = visitorRepository.findByMSISDN(trigger.getMSISDN());
                 Optional<Visitor> visitorsWithThisASID = visitorRepository.findById(trigger.getASID());
                 Visitor visitor;
                 Visitor visitorWithThisASID;
                 if (visitorsWithThisASID.isEmpty()){
-                    if (visitorsWithThisMSISDN.isEmpty()){
+                    if (visitors.isEmpty()){
                         visitor = new Visitor(trigger.getUnitId(), trigger.getContainerId(), trigger.getMSISDN());
+                        String url = "http://127.0.0.1:8090/api/users" + "?MSISDN="+trigger.getMSISDN().toString();
+                        RestTemplate restTemplate = new RestTemplate();
+                        UserDTO user = restTemplate.getForObject(url, UserDTO.class);
+                        if (user.getFirstName() != null){ visitor.setFirstName(user.getFirstName()); }
+                        if (user.getLastName() != null){ visitor.setLastName(user.getLastName()); }
+                        if (user.getPatronymic() != null){ visitor.setPatronymic(user.getPatronymic()); }
                         visitor = visitorRepository.save(visitor);
                     }
                     else{
-                        visitor = visitorsWithThisMSISDN.get(0);
+                        visitor = visitors.get(0);
                     }
-                    data = new Data(trigger.getTriggerId(), trigger.getUnitId(), trigger.getContainerId(), visitor.getASID(), trigger.getEvent(), date);
-                    asiddto.setASID(visitor.getASID());
                 }
                 else{
-                    if (visitorsWithThisMSISDN.isEmpty()){
+                    if (visitors.isEmpty()){
                         visitorWithThisASID = visitorsWithThisASID.get();
                         visitorWithThisASID.setMSISDN(trigger.getMSISDN());
-                        // Здесь должна быть отправка на обогощение
+                        String url = "http://127.0.0.1:8090/api/users" + "?MSISDN="+trigger.getMSISDN().toString();
+                        RestTemplate restTemplate = new RestTemplate();
+                        UserDTO user = restTemplate.getForObject(url, UserDTO.class);
+                        if (user.getFirstName() != null){ visitorWithThisASID.setFirstName(user.getFirstName()); }
+                        if (user.getLastName() != null){ visitorWithThisASID.setLastName(user.getLastName()); }
+                        if (user.getPatronymic() != null){ visitorWithThisASID.setPatronymic(user.getPatronymic()); }
                         visitor = visitorRepository.save(visitorWithThisASID);
-                        data = new Data(trigger.getTriggerId(), trigger.getUnitId(), trigger.getContainerId(), visitor.getASID(), trigger.getEvent(), date);
-                        asiddto.setASID(visitor.getASID());
                     }
                     else{
-                        visitor = visitorsWithThisMSISDN.get(0);
-                        data = new Data(trigger.getTriggerId(), trigger.getUnitId(), trigger.getContainerId(), visitor.getASID(), trigger.getEvent(), date);
-                        asiddto.setASID(visitor.getASID());
+                        visitor = visitors.get(0);
                     }
                 }
+                data = new Data(trigger.getTriggerId(), trigger.getUnitId(), trigger.getContainerId(), visitor.getASID(), trigger.getEvent(), date);
+                asiddto.setASID(visitor.getASID());
             }
         }
         dataRepository.save(data);

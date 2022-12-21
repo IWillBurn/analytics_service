@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.sql.Timestamp;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/scripts")
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class ScriptsController {
             value = "/{id}.js",
             produces = "application/javascript"
     )
-    public  byte[] getScript(@PathVariable("id") String id) throws IOException {
+    public byte[] getScript(@PathVariable("id") String id) throws IOException {
         return IOUtils.toByteArray(minioController.getObject("scripts", "scripts_"+id));
     }
 }

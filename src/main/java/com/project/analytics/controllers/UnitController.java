@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/units")
 @RequiredArgsConstructor
@@ -32,6 +33,8 @@ public class UnitController {
     private ContainerRepository containerRepository;
     @Autowired
     private TriggerRepository triggerRepository;
+    @Autowired
+    private DataRepository dataRepository;
 
     @Autowired
     private MinioController minioController;
@@ -58,7 +61,9 @@ public class UnitController {
             value = "",
             produces = "application/json"
     )
-    public String getPageOfUnit(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "pageSize", required = false) Integer pageSize, @RequestParam(name = "userId") Long userId){
+    public String getPageOfUnit(@RequestParam(name = "page", required = false) Integer page,
+                                @RequestParam(name = "pageSize", required = false) Integer pageSize,
+                                @RequestParam(name = "userId") Long userId){
         String json = "{}";
         ObjectMapper objectMapper = new ObjectMapper();
         List<Unit> searchResult = unitRepository.findByUserId(userId);
@@ -128,6 +133,7 @@ public class UnitController {
     )
     @Transactional
     public void deleteUnit(@PathVariable("unit_id") Long unitId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        dataRepository.deleteByUnitId(unitId);
         triggerRepository.deleteByUnitId(unitId);
         List<Container> deletedContainers = containerRepository.deleteByUnitId(unitId);
         unitRepository.deleteById(unitId);

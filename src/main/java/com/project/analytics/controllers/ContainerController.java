@@ -26,6 +26,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/containers")
 @RequiredArgsConstructor
@@ -38,6 +39,8 @@ public class ContainerController {
     private ContainerRepository containerRepository;
     @Autowired
     private TriggerRepository triggerRepository;
+    @Autowired
+    private DataRepository dataRepository;
     @Autowired
     private MinioController minioController;
 
@@ -68,7 +71,9 @@ public class ContainerController {
             value = "",
             produces = "application/json"
     )
-    public String getPageOfContainer(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "pageSize", required = false) Integer pageSize, @RequestParam(name = "unitId") Long unitId){
+    public String getPageOfContainer(@RequestParam(name = "page", required = false) Integer page,
+                                     @RequestParam(name = "pageSize", required = false) Integer pageSize,
+                                     @RequestParam(name = "unitId") Long unitId){
         String json = "{}";
         ObjectMapper objectMapper = new ObjectMapper();
         List<Container> searchResult = containerRepository.findByUnitId(unitId);
@@ -117,7 +122,7 @@ public class ContainerController {
         }
 
         String filePath = "src/main/resources/static/trigger" + newContainer.getContainerId().toString() + ".js";
-        createLocalScripts(filePath, triggers);
+        createLocalScripts(filePath, triggers, requestBody.getUnitId(), newContainer.getContainerId());
         minioController.sendScripts(filePath, "scripts", "scripts_"+newContainer.getContainerId().toString(), true);
         deleteLocalScripts(filePath);
 
@@ -159,15 +164,15 @@ public class ContainerController {
         List<Trigger> allTriggers = triggerRepository.findByContainerId(containerId);
         for (Trigger t : allTriggers){
             if (!changedIds.contains(t.getTriggerId())){
+                dataRepository.deleteByTriggerId(t.getTriggerId());
                 triggerRepository.deleteById(t.getTriggerId());
             }
         }
 
         String filePath = "src/main/resources/static/trigger" + containerId.toString() + ".js";
-        createLocalScripts(filePath, triggers);
+        createLocalScripts(filePath, triggers, result.getUnitId(), containerId);
         minioController.sendScripts(filePath, "scripts", "scripts_"+containerId.toString(), true);
         deleteLocalScripts(filePath);
-
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
@@ -181,17 +186,19 @@ public class ContainerController {
             produces = "application/json"
     )
     @Transactional
-    public void deleteContainer(@PathVariable("container_id") Long containerId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public String deleteContainer(@PathVariable("container_id") Long containerId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        dataRepository.deleteByContainerId(containerId);
         triggerRepository.deleteByContainerId(containerId);
         Container container = containerRepository.findById(containerId).get();
         List<Container> containers = new LinkedList<>();
         containers.add(container);
         minioController.deleteMinIOScripts(containers, "scripts", "scripts_");
         containerRepository.deleteById(containerId);
+        return "{ \"containerId\": " + containerId + " }";
     }
 
     // Создание файла скриптов для контейнера
-    private void createLocalScripts(String filePath, List<TriggerTemplateDTO> triggers) throws IOException {
+    private void createLocalScripts(String filePath, List<TriggerTemplateDTO> triggers, Long unitId, Long containerId) throws IOException {
         VelocityEngine velocityEngine = new VelocityEngine();
         velocityEngine.init();
 
@@ -199,7 +206,8 @@ public class ContainerController {
 
         VelocityContext context = new VelocityContext();
         context.put("triggers", triggers);
-
+        context.put("unitId", triggers);
+        context.put("containerId", containerId);
 
         File saveFile = new File(filePath);
         if (!saveFile.getParentFile().exists()) {
