@@ -28,6 +28,8 @@ You can see the frontend part here: https://github.com/gmvrpw/analytic-ui
 &emsp;&emsp;&emsp;&emsp;&nbsp;|_Контенер1  
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;|_Триггер1  
   
+Посетитель (ASID, MSISDN, first_name, last_name, patronymic)
+  
 Что оно умеет: (Postman "документация" с примерами по api: https://documenter.getpostman.com/view/24365536/2s8YzZPKFp)  
 &emsp;Добавлять/изменять/удалять/возвращать юниты/контейнеры с тригерами (PostgreSQL)  
 &emsp;Фомировать/сохранять/изменять/отправлять js-файлы с скриптами (MinIO, Velocity)  
