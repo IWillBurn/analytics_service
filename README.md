@@ -35,4 +35,4 @@ You can see the frontend part here: https://github.com/gmvrpw/analytic-ui
 &emsp;Фомировать/сохранять/изменять/отправлять js-файлы с скриптами (MinIO, Velocity)  
 &emsp;Принимать/сохранять данные полученные от триггеров (PostgreSQL)  
 &emsp;Обогощать данные через внешний сервер (PostgreSQL)  
-&emsp;Ответы на основные типы запросов (PostgreSQL)  
+&emsp;Отвечать на основные типы запросов (PostgreSQL)  
