@@ -54,7 +54,10 @@ public class ContainerController {
         List<Trigger> triggers = triggerRepository.findByContainerId(containerId);
         List<TriggerDTO> triggersReturn = new ArrayList<>();
         for (Trigger t : triggers){
-            triggersReturn.add(new TriggerDTO(t));
+            if (!(t.getEvent().equals("online") || t.getEvent().equals("init"))) {
+                System.out.println(t.getEvent());
+                triggersReturn.add(new TriggerDTO(t));
+            }
         }
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{}";
@@ -89,7 +92,9 @@ public class ContainerController {
             List<Trigger> triggers = triggerRepository.findByContainerId(c.getContainerId());
             List<TriggerDTO> triggersReturn = new ArrayList<>();
             for (Trigger t : triggers){
-                triggersReturn.add(new TriggerDTO(t));
+                if (!(t.getEvent().equals("online") || t.getEvent().equals("init"))) {
+                    triggersReturn.add(new TriggerDTO(t));
+                }
             }
             outputs.add(new ContainerDTO(c, triggersReturn));
         }
@@ -121,8 +126,15 @@ public class ContainerController {
             resultTriggers.add(new TriggerDTO(newTrigger));
         }
 
+        Trigger newTriggerInit = new Trigger(newContainer.getContainerId(), newContainer.getUnitId(), newContainer.getUserId(), "", "", "", "init");
+        newTriggerInit = triggerRepository.save(newTriggerInit);
+        Long initId = newTriggerInit.getTriggerId();
+        Trigger newTriggerOnline = new Trigger(newContainer.getContainerId(), newContainer.getUnitId(), newContainer.getUserId(), "", "", "", "online");
+        newTriggerOnline = triggerRepository.save(newTriggerOnline);
+        Long onlineId = newTriggerOnline.getTriggerId();
+
         String filePath = "src/main/resources/static/trigger" + newContainer.getContainerId().toString() + ".js";
-        createLocalScripts(filePath, triggers, requestBody.getUnitId(), newContainer.getContainerId());
+        createLocalScripts(filePath, triggers, requestBody.getUnitId(), newContainer.getContainerId(), initId, onlineId);
         minioController.sendScripts(filePath, "scripts", "scripts_"+newContainer.getContainerId().toString(), true);
         deleteLocalScripts(filePath);
 
@@ -147,6 +159,9 @@ public class ContainerController {
         List<TriggerDTO> resultTriggers = new ArrayList<>();
         Set<Long> changedIds = new HashSet<>();
 
+        Long initId = 0L;
+        Long onlineId = 0L;
+
         for (TriggerDTO t : requestBody.getTriggers()){
             Trigger newTrigger;
             if (t.getTriggerId() != null){
@@ -158,19 +173,27 @@ public class ContainerController {
             newTrigger = triggerRepository.save(newTrigger);
             changedIds.add(newTrigger.getTriggerId());
             resultTriggers.add(new TriggerDTO(newTrigger));
-            triggers.add(new TriggerTemplateDTO(t, result.getUnitId(), containerId, newTrigger.getTriggerId(), 0L));
+            if (!(newTrigger.getEvent().equals("online") || newTrigger.getEvent().equals("init"))) {
+                triggers.add(new TriggerTemplateDTO(t, result.getUnitId(), containerId, newTrigger.getTriggerId(), 0L));
+            }
         }
 
         List<Trigger> allTriggers = triggerRepository.findByContainerId(containerId);
         for (Trigger t : allTriggers){
             if (!changedIds.contains(t.getTriggerId())){
-                dataRepository.deleteByTriggerId(t.getTriggerId());
-                triggerRepository.deleteById(t.getTriggerId());
+                if (!(t.getEvent().equals("online") || t.getEvent().equals("init"))) {
+                    dataRepository.deleteByTriggerId(t.getTriggerId());
+                    triggerRepository.deleteById(t.getTriggerId());
+                }
+                else{
+                    if (t.getEvent().equals("init")){ initId = t.getTriggerId(); }
+                    else{ onlineId = t.getTriggerId(); }
+                }
             }
         }
 
         String filePath = "src/main/resources/static/trigger" + containerId.toString() + ".js";
-        createLocalScripts(filePath, triggers, result.getUnitId(), containerId);
+        createLocalScripts(filePath, triggers, result.getUnitId(), containerId, initId, onlineId);
         minioController.sendScripts(filePath, "scripts", "scripts_"+containerId.toString(), true);
         deleteLocalScripts(filePath);
 
@@ -198,7 +221,7 @@ public class ContainerController {
     }
 
     // Создание файла скриптов для контейнера
-    private void createLocalScripts(String filePath, List<TriggerTemplateDTO> triggers, Long unitId, Long containerId) throws IOException {
+    private void createLocalScripts(String filePath, List<TriggerTemplateDTO> triggers, Long unitId, Long containerId, Long initId, Long onlineId) throws IOException {
         VelocityEngine velocityEngine = new VelocityEngine();
         velocityEngine.init();
 
@@ -206,8 +229,10 @@ public class ContainerController {
 
         VelocityContext context = new VelocityContext();
         context.put("triggers", triggers);
-        context.put("unitId", triggers);
+        context.put("unitId", unitId);
         context.put("containerId", containerId);
+        context.put("initId", initId);
+        context.put("onlineId", onlineId);
 
         File saveFile = new File(filePath);
         if (!saveFile.getParentFile().exists()) {

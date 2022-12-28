@@ -39,12 +39,14 @@ public class TriggerController {
 
     @PostMapping("")
     public String getDataFromTrigger(@RequestBody TriggerResultDTO trigger) throws IOException, JSONException {
+        System.out.println(trigger);
         Timestamp date = new Timestamp(System.currentTimeMillis());
         System.out.println(System.currentTimeMillis());
         Data data;
         ASIDDTO asiddto = new ASIDDTO(0L);
-        if (trigger.getMSISDN() == null){
-            if (trigger.getASID() == null){
+        if (trigger.getMSISDN() == null || trigger.getMSISDN() == -1){
+            if (trigger.getASID() == null || trigger.getASID() == -1){
+                System.out.println("here2");
                 Visitor visitor = new Visitor(trigger.getUnitId(), trigger.getContainerId());
                 visitor = visitorRepository.save(visitor);
                 data = new Data(trigger.getTriggerId(), trigger.getUnitId(), trigger.getContainerId(), visitor.getASID(), trigger.getEvent(), date);
@@ -59,6 +61,7 @@ public class TriggerController {
                     asiddto.setASID(visitor.getASID());
                 }
                 else {
+                    System.out.println("here5");
                     data = new Data(trigger.getTriggerId(), trigger.getUnitId(), trigger.getContainerId(), trigger.getASID(), trigger.getEvent(), date);
                     asiddto.setASID(trigger.getASID());
                 }
@@ -66,7 +69,7 @@ public class TriggerController {
         }
         else{
             List<Visitor> visitors = visitorRepository.findByMSISDN(trigger.getMSISDN());
-            if (trigger.getASID() == null){
+            if (trigger.getASID() == null || trigger.getASID() == -1) {
                 Visitor visitor;
                 if (visitors.isEmpty()){
                     visitor = new Visitor(trigger.getUnitId(), trigger.getContainerId(), trigger.getMSISDN());

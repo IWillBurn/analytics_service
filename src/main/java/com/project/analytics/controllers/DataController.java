@@ -8,6 +8,7 @@ import com.project.analytics.dto.postgres.ContainerDTO;
 import com.project.analytics.dto.postgres.ElementDTO;
 import com.project.analytics.dto.postgres.TriggerDTO;
 import com.project.analytics.dto.request.DataDTO;
+import com.project.analytics.dto.request.DataListDTO;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class DataController {
                                 @RequestParam(name = "page", required = false) Integer page,
                                 @RequestParam(name = "pageSize", required = false) Integer pageSize) throws JsonProcessingException {
         List<Data> searchResult = dataRepository.findByUnitIdOrderByDateDesc(unitId);
+        Long countOfPages = searchResult.size()/pageSize + 1L;
         if (page != null){
             List<Data> bufferResult = new ArrayList<>(searchResult);
             searchResult.clear();
@@ -54,7 +56,7 @@ public class DataController {
             Visitor visitor = visitorRepository.findById(d.getASID()).get();
             Trigger trigger = triggerRepository.findById(d.getTriggerId()).get();
 
-            DataDTO data = new DataDTO(container.getContainerName(), new ElementDTO(trigger.getWebName(), trigger.getWebId(), trigger.getWebClass()), trigger.getEvent(), d.getASID(), d.getDate().getTime());
+            DataDTO data = new DataDTO(d.getDataId(), container.getContainerName(), new ElementDTO(trigger.getWebName(), trigger.getWebId(), trigger.getWebClass()), trigger.getEvent(), d.getASID(), d.getDate().getTime());
             if (visitor.getFirstName() != null){ data.setIsEnrichment(true); }
             if (visitor.getMSISDN() != null){ data.setMSISDN(visitor.getMSISDN()); }
             if (visitor.getFirstName() != null){ data.setFirstName(visitor.getFirstName()); }
@@ -65,7 +67,7 @@ public class DataController {
 
         String json = "{}";
         ObjectMapper objectMapper = new ObjectMapper();
-        json = objectMapper.writeValueAsString(result);
+        json = objectMapper.writeValueAsString(new DataListDTO(result, countOfPages));
         return json;
     }
 }

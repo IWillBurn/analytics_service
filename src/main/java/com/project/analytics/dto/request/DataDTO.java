@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DataDTO {
+    private Long dataId;
     private String containerName;
     private ElementDTO element;
     private String event;
@@ -20,7 +21,8 @@ public class DataDTO {
     private String lastName;
     private String patronymic;
     private Long date;
-    public DataDTO(String name, ElementDTO el, String ev, Long id, Long d){
+    public DataDTO(Long data, String name, ElementDTO el, String ev, Long id, Long d){
+        dataId = data;
         containerName = name;
         element = el;
         event = ev;

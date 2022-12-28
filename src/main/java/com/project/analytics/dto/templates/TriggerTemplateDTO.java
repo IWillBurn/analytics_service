@@ -14,7 +14,12 @@ public class TriggerTemplateDTO {
     String event;
 
     public TriggerTemplateDTO(Long unit, Long container, Long id, Long analyticsId, String eventType, ElementDTO el){
-        querySelector = el.getName()+"#"+el.getId()+"."+el.getClassName();
+        if (el.getId() != "") {
+            querySelector = el.getName() + "#" + el.getId() + "." + el.getClassName();
+        }
+        else{
+            querySelector = el.getName() + "." + el.getClassName();
+        }
         unitId = unit;
         containerId = container;
         triggerId = id;
@@ -23,7 +28,22 @@ public class TriggerTemplateDTO {
     }
 
     public TriggerTemplateDTO(TriggerDTO trigger, Long unit, Long container, Long id, Long analyticsId){
-        querySelector = trigger.getElement().getName()+"#"+trigger.getElement().getId()+"."+trigger.getElement().getClassName();
+        if (trigger.getElement().getId() != "") {
+            if (trigger.getElement().getClassName() != "") {
+                querySelector = trigger.getElement().getName() + "#" + trigger.getElement().getId() + "." + trigger.getElement().getClassName();
+            }
+            else{
+                querySelector = trigger.getElement().getName() + "#" + trigger.getElement().getId();
+            }
+        }
+        else{
+            if (trigger.getElement().getClassName() != "") {
+                querySelector = trigger.getElement().getName() + "." + trigger.getElement().getClassName();
+            }
+            else{
+                querySelector = trigger.getElement().getName();
+            }
+        }
         unitId = unit;
         containerId = container;
         triggerId = id;

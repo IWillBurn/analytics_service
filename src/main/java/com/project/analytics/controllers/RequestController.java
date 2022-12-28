@@ -32,9 +32,12 @@ public class RequestController {
                                       @RequestParam(name = "unique", required = false) Boolean unique,
                                       @RequestParam(name = "dateFrom", required = false) Long dateFrom,
                                       @RequestParam(name = "dateTo", required = false) Long dateTo) {
+        System.out.println(dateFrom);
+        System.out.println(dateTo);
+        System.out.println(System.currentTimeMillis());
         Long result = 0L;
-        if (dateFrom == null){ dateFrom = 0L; }
-        if (dateTo == null){ dateTo = 6311520000000L; }
+        if (dateFrom == -1 || dateFrom == null){ dateFrom = 0L; }
+        if (dateTo == -1 || dateTo == null){ dateTo = 6311520000000L; }
         if (unique == null){ unique = true; }
         if (unique) {
             result = dataRepository.countTriggeredDistinct(triggerId, new Date(dateFrom), new Date(dateTo));
@@ -55,10 +58,10 @@ public class RequestController {
                                                @RequestParam(name = "dateFrom", required = false) Long dateFrom,
                                                @RequestParam(name = "dateTo", required = false) Long dateTo) {
         List<Long> resultASID = new ArrayList<>();
-        if (deltaTimeMin == null){ deltaTimeMin = 0L; }
-        if (deltaTimeMax == null){ deltaTimeMax = 6311520000000L; }
-        if (dateFrom == null){ dateFrom = 0L; }
-        if (dateTo == null){ dateTo = 6311520000000L; }
+        if (deltaTimeMin == -1 || deltaTimeMin == null){ deltaTimeMin = 0L; }
+        if (deltaTimeMax == -1 || deltaTimeMax == null){ deltaTimeMax = 6311520000000L; }
+        if (dateFrom == -1 || dateFrom == null){ dateFrom = 0L; }
+        if (dateTo == -1 || dateTo == null){ dateTo = 6311520000000L; }
         resultASID = dataRepository.dataEventBAfterEventA(triggerIdA, triggerIdB, new Date(dateFrom), new Date(dateTo), deltaTimeMin*1000000, deltaTimeMax*1000000);
         System.out.println(resultASID);
         return "{ \"result\": " + resultASID.toString() + " }";
@@ -84,8 +87,8 @@ public class RequestController {
                                        @RequestParam(name = "dateTo", required = false) Long dateTo) {
         double resultCountsEnriched = 0L;
         double resultCountsAll = 0L;
-        if (dateFrom == null){ dateFrom = 0L; }
-        if (dateTo == null){ dateTo = 6311520000000L; }
+        if (dateFrom == -1 || dateFrom == null){ dateFrom = 0L; }
+        if (dateTo == -1 || dateTo == null){ dateTo = 6311520000000L; }
         if (containerId == null) {
             resultCountsEnriched = dataRepository.countEnrichedInUnitData(unitId, new Date(dateFrom), new Date(dateTo)).doubleValue();
             resultCountsAll = dataRepository.countAllInUnitData(unitId, new Date(dateFrom), new Date(dateTo)).doubleValue();
