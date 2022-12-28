@@ -76,7 +76,6 @@ docker run -p 9000:9000 -p 9090:9090 —name minio -v ~/minio/data:/data -e "MIN
 &emsp;Velocity - для работы с templates  
 &emsp;PostgreSQL - БД для данных   
 &emsp;MinIO - БД для скриптов  
-&emsp;(Kafka + ClickHouse не реализовано, данные храняться в PostgreSQL D: )  
   
 Структура взаимодействия сущностей:    
 Пользователь  
