@@ -10,61 +10,66 @@
 Запуск приложения:  
 I. PostgreSQL:
 1. Запустить:    
+```shell
 docker run —name analytics -p 5432:5432 -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=password -e POSTGRES_DB=analytics_db -d postgres:13.3  
+```
 (Доступ по localhost:5432)  
 2. Создать таблицы:    
+```sql
 CREATE TABLE owner  
 (  
-&emsp;user_id BIGSERIAL PRIMARY KEY,  
-&emsp;user_name VARCHAR(200) NOT NULL  
+    user_id BIGSERIAL PRIMARY KEY,  
+    user_name VARCHAR(200) NOT NULL  
 );  
 CREATE TABLE unit  
 (  
-&emsp;unit_id BIGSERIAL PRIMARY KEY,  
-&emsp;user_id BIGSERIAL REFERENCES owner (user_id) NOT NULL,  
-&emsp;unit_name VARCHAR(200) NOT NULL  
+    unit_id BIGSERIAL PRIMARY KEY,  
+    user_id BIGSERIAL REFERENCES owner (user_id) NOT NULL,  
+    unit_name VARCHAR(200) NOT NULL  
 );  
 CREATE TABLE container  
 (  
-&emsp;container_id BIGSERIAL PRIMARY KEY,  
-&emsp;user_id BIGSERIAL REFERENCES owner (user_id) NOT NULL,  
-&emsp;unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
-&emsp;container_name VARCHAR(200) NOT NULL  
+    container_id BIGSERIAL PRIMARY KEY,  
+    user_id BIGSERIAL REFERENCES owner (user_id) NOT NULL,  
+    unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
+    container_name VARCHAR(200) NOT NULL  
 );  
 CREATE TABLE trigger  
 (  
-&emsp;trigger_id BIGSERIAL PRIMARY KEY,  
-&emsp;container_id BIGSERIAL REFERENCES container (container_id) NOT NULL,  
-&emsp;unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
-&emsp;user_id BIGSERIAL REFERENCES owner (user_id) NOT NULL,  
-&emsp;web_name VARCHAR(200) NOT NULL,  
-&emsp;web_id VARCHAR(200) NOT NULL,  
-&emsp;web_class VARCHAR(200) NOT NULL,  
-&emsp;event VARCHAR(200) NOT NULL  
+    trigger_id BIGSERIAL PRIMARY KEY,  
+    container_id BIGSERIAL REFERENCES container (container_id) NOT NULL,  
+    unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
+    user_id BIGSERIAL REFERENCES owner (user_id) NOT NULL,  
+    web_name VARCHAR(200) NOT NULL,  
+    web_id VARCHAR(200) NOT NULL,  
+    web_class VARCHAR(200) NOT NULL,  
+    event VARCHAR(200) NOT NULL  
 );  
 CREATE TABLE visitor  
 (  
-&emsp;ASID BIGSERIAL PRIMARY KEY,  
-&emsp;unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
-&emsp;MSISDN BIGINT,  
-&emsp;first_name VARCHAR(200),  
-&emsp;last_name VARCHAR(200),  
-&emsp;patronymic VARCHAR(200)  
+    ASID BIGSERIAL PRIMARY KEY,  
+    unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
+    MSISDN BIGINT,  
+    first_name VARCHAR(200),  
+    last_name VARCHAR(200),  
+    patronymic VARCHAR(200)  
 );  
 CREATE TABLE data  
 (  
-&emsp;data_id BIGSERIAL PRIMARY KEY,  
-&emsp;trigger_id BIGSERIAL REFERENCES trigger (trigger_id) NOT NULL,  
-&emsp;container_id BIGSERIAL REFERENCES container (container_id) NOT NULL,  
-&emsp;unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
-&emsp;ASID BIGSERIAL REFERENCES visitor (ASID) NOT NULL,  
-&emsp;event VARCHAR(200) NOT NULL,  
-&emsp;date timestamp NOT NULL  
+    data_id BIGSERIAL PRIMARY KEY,  
+    trigger_id BIGSERIAL REFERENCES trigger (trigger_id) NOT NULL,  
+    container_id BIGSERIAL REFERENCES container (container_id) NOT NULL,  
+    unit_id BIGSERIAL REFERENCES unit (unit_id) NOT NULL,  
+    ASID BIGSERIAL REFERENCES visitor (ASID) NOT NULL,  
+    event VARCHAR(200) NOT NULL,  
+    date timestamp NOT NULL  
 );   
-
+```
 II. MinIO:  
-1. Запустить:  
+1. Запустить: 
+```shell
 docker run -p 9000:9000 -p 9090:9090 —name minio -v ~/minio/data:/data -e "MINIO_ROOT_USER=ROOTNAME" -e "MINIO_ROOT_PASSWORD=PASSWORD" quay.io/minio/minio server /data —console-address ":9090  
+```
 (Доступ по localhost:9000)  
 2. Создать bucket 'scripts'  
 3. Создать ключ доступа.  
