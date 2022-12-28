@@ -87,7 +87,7 @@ gradle run
 #### PostgreSQL - БД для данных   
 #### MinIO - БД для скриптов  
   
-## Что оно умеет (https://documenter.getpostman.com/view/24365536/2s8YzZPKFp):
+## Что оно умеет ([Postman](https://documenter.getpostman.com/view/24365536/2s8YzZPKFp)):
 #### Добавлять/изменять/удалять/возвращать юниты/контейнеры с тригерами (PostgreSQL)  
 #### Фомировать/сохранять/изменять/отправлять js-файлы с скриптами (MinIO, Velocity)  
 #### Принимать/сохранять данные полученные от триггеров (PostgreSQL)  
