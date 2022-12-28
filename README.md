@@ -80,7 +80,7 @@ docker run -p 9000:9000 -p 9090:9090 —name minio -v ~/minio/data:/data -e "MIN
 ```shell
 gradle run
 ```
-
+(Доступ по localhost:8080/api)  
 
 ## Основные технологии:  
 #### Spring - REST API  
