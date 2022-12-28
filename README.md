@@ -73,8 +73,9 @@ docker run -p 9000:9000 -p 9090:9090 —name minio -v ~/minio/data:/data -e "MIN
 (Доступ по localhost:9000)  
 2. Создать bucket 'scripts'  
 3. Создать ключ доступа.  
-4. Ввести публичный и секретный ключи в MinioController  
-
+4. Ввести публичный и секретный ключи в MinioController    
+III. Java:  
+1. Запустить Java проект.  
 
 Основные технологии:  
 &emsp;Spring - REST API  
